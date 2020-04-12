@@ -58,7 +58,7 @@ public class LetterQuestionsMaker {
     /** generates a list of questions from web **/
     private static ArrayList<Question> getLetterQuestions() {
         int questionsToFind = 20;
-            String rawText = webpageToStr("https://opentdb.com/api.php?amount=" + questionsToFind + "&type=multiple&encode=base64");
+        String rawText = webpageToStr("https://opentdb.com/api.php?amount=" + questionsToFind + "&type=multiple&encode=base64&difficulty=medium");
 
         int charsAfterKeyword = 3;
         String questionKeyword = "question";
@@ -84,7 +84,7 @@ public class LetterQuestionsMaker {
             currentIncorrect = getArray(incorrectIndex, rawText);
 
             if ((currentQuestion != null) && (currentCorrect != null) && (currentIncorrect != null)) {
-                if ((!currentCorrect.contains(",")) && (!currentQuestion.toLowerCase().contains("which"))) {
+                if ((!currentCorrect.contains(",")) && (!currentQuestion.toLowerCase().contains("which")) && (!currentQuestion.toLowerCase().contains("many"))) {
                     output.add(new Question(currentQuestion.stripLeading(), currentCorrect.stripLeading(), currentIncorrect));
                 }
             }

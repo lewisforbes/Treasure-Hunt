@@ -58,7 +58,8 @@ public class Round {
     /** begins a game **/
     private void play() {
         String giveUp = "I give up";
-        System.out.println("I've hidden the treasure at my favourite " + placeType.name().toLowerCase().replaceAll("_", " ") + ". The questions below are a clue...\nIf you're stuck, type in a question number for its answer, or '" + giveUp + "' to give up.\n");
+        System.out.println("I've hidden the treasure at my favourite " + placeType.name().toLowerCase().replaceAll("_", " ") + ". The questions below are a clue...");
+        System.out.println("\nIf you're stuck, type in a question number for its answer, or '" + giveUp + "' to give up.\nYou can also type 'POSTCODE <your postcode>' to see if it's correct.\n");
         questions = new QuestionBank(postcode);
         questions.printBank(false);
 
@@ -78,8 +79,28 @@ public class Round {
                     System.out.println("Well done!");
                     break;
                 }
+                if (inputtedLine.strip().split(" ")[0].equalsIgnoreCase("POSTCODE")) {
+                    postcodeRequest(inputtedLine.strip().substring(inputtedLine.strip().indexOf(" ")+1));
+                }
+                System.out.println("It's not there...\n");
             }
         }
+    }
+
+    /** checks user is sure and then checks if provided postcode is correct **/
+    private void postcodeRequest(String postcode) {
+        System.out.println("Enter 'YES' if you are you sure you'd like to check: " + postcode);
+        String inputtedLine = input.nextLine();
+
+        if (inputtedLine.equalsIgnoreCase("YES")) {
+            if (postcode.strip().replaceAll(" ", "").equalsIgnoreCase(this.postcode)) {
+                System.out.println("Postcode is correct (ignoring spacing).");
+            } else {
+                System.out.println("Postcode is incorrect.");
+            }
+        }
+
+        System.out.print("\n");
     }
 
     /** checks user is sure and then provides answer to specified question **/

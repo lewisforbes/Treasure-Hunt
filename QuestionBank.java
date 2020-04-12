@@ -5,6 +5,7 @@ public class QuestionBank {
 
     public QuestionBank(String str) {
         questionBank = new ArrayList<>();
+        System.out.println("Loading... (may take up to 20 seconds)\n");
         mkQuestionsFromString(str);
     }
 

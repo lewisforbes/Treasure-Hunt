@@ -71,7 +71,7 @@ public class NumberQuestionMaker {
 
     /** checks if a number question was successfully created **/
     private static boolean questionFound(String potQuestion) {
-        return !potQuestion.equals(failedReturn);
+        return (!potQuestion.equals(failedReturn)) && (!potQuestion.equalsIgnoreCase("WhatLED?"));
     }
 
     /** gets a question of given type for given number **/
