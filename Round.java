@@ -58,9 +58,9 @@ public class Round {
     /** begins a game **/
     private void play() {
         String giveUp = "I give up";
-        System.out.println("I've hidden the treasure at my favourite " + placeType.name().toLowerCase().replaceAll("_", " ") + ". The questions below are a clue...");
         System.out.println("\nIf you're stuck, type in a question number for its answer, or '" + giveUp + "' to give up.\nYou can also type 'POSTCODE <your postcode>' to see if it's correct.\n");
         questions = new QuestionBank(postcode);
+        System.out.println("I've hidden the treasure at my favourite " + placeType.name().toLowerCase().replaceAll("_", " ") + ". The questions below are a clue...");
         questions.printBank(false);
 
         String inputtedLine;

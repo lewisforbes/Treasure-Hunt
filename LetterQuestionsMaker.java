@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 public class LetterQuestionsMaker {
 
+    private static final String[] illegalWords = new String[] {"which", "many", "except", "common"};
+
     /** generates a list of questions with answers following a given string of letters **/
     public static ArrayList<Question> mkQsFromGroup(String letters) {
         String toFind = letters;
@@ -58,7 +60,7 @@ public class LetterQuestionsMaker {
     /** generates a list of questions from web **/
     private static ArrayList<Question> getLetterQuestions() {
         int questionsToFind = 20;
-        String rawText = webpageToStr("https://opentdb.com/api.php?amount=" + questionsToFind + "&type=multiple&encode=base64&difficulty=medium");
+        String rawText = webpageToStr("https://opentdb.com/api.php?amount=" + questionsToFind + "&type=multiple&encode=base64&difficulty=" + Main.difficulty.name().toLowerCase());
 
         int charsAfterKeyword = 3;
         String questionKeyword = "question";
@@ -84,7 +86,7 @@ public class LetterQuestionsMaker {
             currentIncorrect = getArray(incorrectIndex, rawText);
 
             if ((currentQuestion != null) && (currentCorrect != null) && (currentIncorrect != null)) {
-                if ((!currentCorrect.contains(",")) && (!currentQuestion.toLowerCase().contains("which")) && (!currentQuestion.toLowerCase().contains("many"))) {
+                if ((!currentCorrect.contains(",")) && questionValid(currentQuestion)) {
                     output.add(new Question(currentQuestion.stripLeading(), currentCorrect.stripLeading(), currentIncorrect));
                 }
             }
@@ -97,6 +99,16 @@ public class LetterQuestionsMaker {
         }
 
         return output;
+    }
+
+    /** checks a question is valid by ensuring it doesn't contain certiain words **/
+    private static boolean questionValid(String question) {
+        for (String word : illegalWords) {
+            if (question.toLowerCase().contains(word.toLowerCase())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** parses a specific array from raw webpage data **/
