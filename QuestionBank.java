@@ -5,7 +5,7 @@ public class QuestionBank {
 
     public QuestionBank(String str) {
         questionBank = new ArrayList<>();
-        System.out.println("Loading... (may take up to 20 seconds)\n");
+        System.out.println("\nLoading... (may take up to 20 seconds)\n");
         mkQuestionsFromString(str);
     }
 
@@ -15,6 +15,11 @@ public class QuestionBank {
     /** returns the answer to the question at the given index **/
     public String getAnswer(int i) {
         return questionBank.get(i).getCorrectAnswer();
+    }
+
+    /** updates the notes of the question at the given index **/
+    public void updateNotes(int i, String notes) {
+        questionBank.get(i).updateNotes(notes);
     }
 
     /** prints all questions in the bank **/

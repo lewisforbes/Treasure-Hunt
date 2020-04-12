@@ -57,67 +57,153 @@ public class Round {
 
     /** begins a game **/
     private void play() {
-        String giveUp = "I give up";
-        System.out.println("\nIf you're stuck, type in a question number for its answer, or '" + giveUp + "' to give up.\nYou can also type 'POSTCODE <your postcode>' to see if it's correct.\n");
+        Command.explainCommands();
         questions = new QuestionBank(postcode);
+
         System.out.println("I've hidden the treasure at my favourite " + placeType.name().toLowerCase().replaceAll("_", " ") + ". The questions below are a clue...\n");
         questions.printBank(false);
 
-        String inputtedLine;
+        String inputtedLineStr;
+        String[] inputtedLineArr;
+        String notes;
+        boolean givenUp = false;
         while (true) {
-            System.out.println("Where's the treasure?");
-            inputtedLine = input.nextLine();
+            System.out.println("\nWhere's the treasure?");
+            inputtedLineStr = input.nextLine();
+            if (inputtedLineStr.strip().equalsIgnoreCase(placeName)) {
+                System.out.println("Well done! That's correct\n");
+                break;
+            }
 
+            inputtedLineArr = inputtedLineStr.strip().split(" ");
+            boolean cmdTriggered = false;
             try {
-                answerRequest(Integer.parseInt(inputtedLine.strip()));
-            } catch (NumberFormatException e) {
-                if (inputtedLine.strip().equalsIgnoreCase(giveUp)) {
-                    givenUp();
+                // switch statement wouldn't work...
+                while (true) {
+                    String toCompare = inputtedLineArr[0].strip();
+
+                    if (toCompare.equalsIgnoreCase(Command.ANSWER.name())) {
+                        cmdTriggered = true;
+                        answerCmd(Integer.parseInt(inputtedLineArr[1]));
+                        break;
+                    }
+
+                    if (toCompare.equalsIgnoreCase(Command.UPDATE.name())) {
+                        cmdTriggered = true;
+                        notes = inputtedLineArr[2];
+                        for (int i = 3; i < inputtedLineArr.length; i++) {
+                            notes += " ";
+                            notes += inputtedLineArr[i];
+                        }
+
+                        updateCmd(Integer.parseInt(inputtedLineArr[1]), notes);
+                        break;
+                    }
+
+                    if (toCompare.equalsIgnoreCase(Command.POSTCODE.name())) {
+                        cmdTriggered = true;
+                        postcodeCmd(inputtedLineArr[1]);
+                        break;
+                    }
+
+                    if (inputtedLineStr.equalsIgnoreCase(Command.I_GIVE_UP.name().replaceAll("_", " "))) {
+                        cmdTriggered = true;
+                        givenUp = givenUpCmd();
+                        break;
+                    }
+
+                    if (toCompare.equalsIgnoreCase(Command.HELP.name())) {
+                        cmdTriggered = true;
+                        helpCmd();
+                        break;
+                    }
+
+                    if (toCompare.equalsIgnoreCase(Command.QUESTIONS.name())) {
+                        cmdTriggered = true;
+                        questions.printBank(false);
+                        break;
+                    }
+
                     break;
                 }
-                if (inputtedLine.strip().equalsIgnoreCase(placeName.strip())) {
-                    System.out.println("Well done!");
-                    break;
+            } catch (Exception e) {
+                if (cmdTriggered) {
+                    System.err.println("Command format is incorrect.");
                 }
-                if (inputtedLine.strip().split(" ")[0].equalsIgnoreCase("POSTCODE")) {
-                    postcodeRequest(inputtedLine.strip().substring(inputtedLine.strip().indexOf(" ")+1));
-                }
+            }
+
+            if (givenUp) {
+                break;
+            }
+
+            if (!cmdTriggered) {
                 System.out.println("It's not there...\n");
             }
         }
     }
 
-    /** checks user is sure and then checks if provided postcode is correct **/
-    private void postcodeRequest(String postcode) {
-        System.out.println("Enter 'YES' if you are you sure you'd like to check: " + postcode);
-        String inputtedLine = input.nextLine();
-
-        if (inputtedLine.equalsIgnoreCase("YES")) {
-            if (postcode.strip().replaceAll(" ", "").equalsIgnoreCase(this.postcode)) {
-                System.out.println("Postcode is correct (ignoring spacing).");
-            } else {
-                System.out.println("Postcode is incorrect.");
-            }
-        }
-
-        System.out.print("\n");
+    /** checks if a user is sure of their input **/
+    private boolean isSure(String request) {
+        String sure = "YES";
+        System.out.println("Type '" + sure + "' if you definitely want to " + request + ". Type anything else to cancel: ");
+        return (input.nextLine().equalsIgnoreCase(sure));
     }
 
-    /** checks user is sure and then provides answer to specified question **/
-    private void answerRequest(int questionNum) {
-        if (questionNum > questions.numOfQuestions()) {
-            System.err.println("You have requested the answer to a question that doesn't exist");
+    /** executes the ANSWER command **/
+    private void answerCmd(int question) {
+        if ((question > questions.numOfQuestions()) || (question <= 0)) {
+            System.err.println("Inputted question does not exist.");
             return;
         }
 
-        System.out.println("Enter 'YES' if you are you sure you'd like the answer to Q" + questionNum + ":");
-        String inputtedLine = input.nextLine();
-
-        if (inputtedLine.equalsIgnoreCase("YES")) {
-            System.out.println(questions.getAnswer(questionNum-1));
+        if (!isSure("see the answer to question " + question)) {
+            System.out.println("Command cancelled.");
+            return;
         }
 
-        System.out.print("\n");
+        System.out.println("Answer to Q" + question + ": " + questions.getAnswer(question-1));
+    }
+
+    /** executes the UPDATE command **/
+    private void updateCmd(int question, String notes) {
+        if ((question > questions.numOfQuestions()) || (question <= 0)) {
+            System.err.println("Inputted question does not exist.");
+            return;
+        }
+
+        questions.updateNotes(question-1, notes);
+        questions.printBank(false);
+    }
+
+    /** executes the POSTCODE command **/
+    private void postcodeCmd(String postcode) {
+        if (!isSure("check if " + postcode + "is the correct postcode")) {
+            System.out.println("Command cancelled.");
+            return;
+        }
+
+        if (postcode.strip().replaceAll(" ", "").equalsIgnoreCase(this.postcode)) {
+            System.out.println("Postcode is correct (ignoring spacing).");
+        } else {
+            System.out.println("Postcode is incorrect.");
+        }
+    }
+
+    /** executes the I_GIVE_UP command **/
+    private boolean givenUpCmd() {
+        if (!isSure("give up")) {
+            return false;
+        }
+        System.out.println("\nBetter luck next time!\nHere are the answers: ");
+        questions.printBank(true);
+        System.out.println("Postcode: " + postcode);
+        System.out.println(Character.toUpperCase(placeType.name().charAt(0)) + placeType.name().substring(1).toLowerCase() + ": " + placeName);
+        return true;
+    }
+
+    /** executes the HELP command **/
+    private void helpCmd() {
+        Command.explainCommands();
     }
 
     /** gets place name from Google API **/
@@ -150,13 +236,5 @@ public class Round {
         int startOfData = rawData.indexOf(keyWord) + keyWord.length() + buffer;
         int endOfData = rawData.substring(startOfData).indexOf(stopAt) + startOfData;
         return rawData.substring(startOfData, endOfData);
-    }
-
-    /** method to run when player has given up **/
-    private void givenUp() {
-        System.out.println("\nBetter luck next time!\nHere are the answers: ");
-        questions.printBank(true);
-        System.out.println("Postcode: " + postcode);
-        System.out.println(Character.toUpperCase(placeType.name().charAt(0)) + placeType.name().substring(1).toLowerCase() + ": " + placeName);
     }
 }

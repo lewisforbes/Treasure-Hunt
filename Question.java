@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class Question {
     private String question;
     private String correctAnswer;
+    private String userNotes = null;
     private ArrayList<String> incorrectAnswers;
 
     /** number of incorrect answers to generate per question **/
@@ -30,6 +31,10 @@ public class Question {
         this.question = question;
         this.correctAnswer = correctAnswer;
         this.incorrectAnswers = mkIncorrectAnswers(correctAnswer);
+    }
+
+    public void updateNotes(String notes) {
+        userNotes = notes;
     }
 
     private ArrayList<String> mkIncorrectAnswers(String correctAnswer) {
@@ -65,6 +70,12 @@ public class Question {
 
     public void printQuestion(boolean showAnswers) {
         System.out.println(question);
+        if (userNotes == null) {
+            System.out.println("Notes: [empty]");
+        } else {
+            System.out.println("Notes: " + userNotes);
+        }
+
         if (showAnswers) {
             System.out.println("A: " + correctAnswer);
         }

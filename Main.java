@@ -35,7 +35,7 @@ public class Main {
                     return difficulty;
                 }
             }
-            System.err.println("Invalid input\n");
+            System.err.println("Invalid input");
         }
     }
 }
