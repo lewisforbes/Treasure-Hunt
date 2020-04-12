@@ -11,17 +11,30 @@ public class Round {
     private String apiKey;
     private Scanner input = new Scanner(System.in);
 
+    /** values to use if player has no API key **/
+    private static final String exPostcode = "TN12 9DH";
+    private static final PlaceTypes exPlaceType = PlaceTypes.BAR;
+    public static final String exPlaceName = "Unicorn Pub and Restaurant";
+
     public Round(String apiKey) {
         this.apiKey = apiKey;
-        this.postcode = getRandomPostcode();
-        this.placeType = PlaceTypes.getRandomPlaceType();
-        this.placeName = getPlaceName();
-        if (placeName.equals("dates")) {
-            System.err.println("Error: API key is invalid. Restart the program and try again");
+
+        if (apiKey.strip().toUpperCase().equals(Main.exampleKeyword)) {
+            this.postcode = exPostcode;
+            this.placeType = exPlaceType;
+            this.placeName = exPlaceName;
         } else {
-            System.out.println("Form a postcode from the first letter or full number for the answers to the following questions.");
-            play();
+            this.postcode = getRandomPostcode();
+            this.placeType = PlaceTypes.getRandomPlaceType();
+            this.placeName = getPlaceName();
+            if (placeName.equals("dates")) {
+                System.err.println("Error: API key is invalid. Restart the program and try again");
+                return;
+            } else {
+                System.out.println("Form a postcode from the first letter or full number for the answers to the following questions.");
+            }
         }
+        play();
     }
 
     /** gets a random UK postcode **/
@@ -68,7 +81,7 @@ public class Round {
         String notes;
         boolean givenUp = false;
         while (true) {
-            System.out.println("\nWhere's the treasure?");
+            System.out.println("\nWhere's the treasure? (or enter a command)");
             inputtedLineStr = input.nextLine();
             if (inputtedLineStr.strip().equalsIgnoreCase(placeName)) {
                 System.out.println("Well done! That's correct\n");
