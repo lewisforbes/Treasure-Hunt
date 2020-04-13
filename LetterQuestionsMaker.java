@@ -59,7 +59,7 @@ public class LetterQuestionsMaker {
 
     /** generates a list of questions from web **/
     private static ArrayList<Question> getLetterQuestions() {
-        int questionsToFind = 20;
+        int questionsToFind = 50;
         String rawText = webpageToStr("https://opentdb.com/api.php?amount=" + questionsToFind + "&type=multiple&encode=base64&difficulty=" + Main.difficulty.name().toLowerCase());
 
         int charsAfterKeyword = 3;
